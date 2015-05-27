@@ -78,7 +78,7 @@ function setup() {
     new THREE.Vector3( 35.03, 18.67, 59 ),
     new THREE.Vector3( 41.02, -89.52, -56.53 ),
     new THREE.Vector3( -1.77, -56.52, 97.48 ),
-    new THREE.Vector3( -82.17, -55.2, -99.59 ),
+    new THREE.Vector3( -2.17, -55.2, -99.59 ),
     new THREE.Vector3( 30.41, 6.23, 93.24 ),
     new THREE.Vector3( -2.17, -23.35, 89.44 ),
     new THREE.Vector3( 85.82, -50.71, 30.72 ),
@@ -133,8 +133,8 @@ function draw() {
 
 }
 
-setup();
-draw();
+// setup();
+// draw();
 
 
 
