@@ -1,3 +1,5 @@
 # TERMITE
 
-http://torquemad.github.io/TERMITE/
+
+demo (in progress): http://torquemad.github.io/TERMITE/
+
