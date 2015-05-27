@@ -72,6 +72,13 @@ var points = [
   new THREE.Vector3( -4.11, 96.3, -71.78 ),
 ];
 
+// [16:49] <bai> the basics of it are just that you need to set geometry.verticessNeedUpdate = true whenever they change, and that yes, if you're not calling your render functio in a loop then you'll need to call that too
+
+
+function updateGeometry(){
+  geometry.verticessNeedUpdate = true;
+}
+
 function setup() {
 
 
@@ -127,26 +134,21 @@ function setup() {
 
 
 function onWindowResize() {
-
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-
   renderer.setSize( window.innerWidth, window.innerHeight );
-
-  controls.handleResize();
-
 }
 
 function draw() {
 
   requestAnimationFrame( draw );
   
-  mesh.rotation.x = Date.now() * 0.005;  
+  mesh.rotation.x = Date.now() * 0.0005;  
   mesh.rotation.y = Date.now() * 0.0002;  
   mesh.rotation.z = Date.now() * 0.0001;
   renderer.render( scene, camera );
 }
 
-
+window.addEventListener('resize', onWindowResize, false);
 setup();
 draw();
