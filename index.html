@@ -49,8 +49,8 @@
           oscillator.type = 'sawtooth';
           oscillator.frequency.value = frequency;
           oscillator.connect(masterGain);
-          oscillator.start(0);
           oscillator.detune.value = 2 * -1000
+          oscillator.start(0);
           nodes.push(oscillator);
       };
 

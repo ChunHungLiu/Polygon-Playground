@@ -62,6 +62,8 @@ var geometry, material, mesh;
 
 function setup() {
 
+
+
   var W = window.innerWidth, H = window.innerHeight;
   renderer = new THREE.WebGLRenderer();
   renderer.setSize( W, H );
@@ -71,11 +73,28 @@ function setup() {
   camera.position.z = 300;
 
   scene = new THREE.Scene();
-  
-  geometry = new THREE.IcosahedronGeometry(150, 0);
-  material = new THREE.MeshPhongMaterial({shading: THREE.FlatShading, color: 0xff0000, ambient: 0xffffff, emissive: 0x24479b, specular: 0xfa0000, shininess: 100});
+
+  var points = [
+    new THREE.Vector3( 35.03, 18.67, 59 ),
+    new THREE.Vector3( 41.02, -89.52, -56.53 ),
+    new THREE.Vector3( -1.77, -56.52, 97.48 ),
+    new THREE.Vector3( -82.17, -55.2, -99.59 ),
+    new THREE.Vector3( 30.41, 6.23, 93.24 ),
+    new THREE.Vector3( -2.17, -23.35, 89.44 ),
+    new THREE.Vector3( 85.82, -50.71, 30.72 ),
+    new THREE.Vector3( -78, -1.84, -17.91 ),
+    new THREE.Vector3( -4.11, 96.3, -71.78 ),
+  ];
+
+  geometry = new THREE.ConvexGeometry( points );
+  material = new THREE.MeshNormalMaterial({shading: THREE.FlatShading});
   mesh = new THREE.Mesh(geometry, material);
   scene.add(mesh);
+  
+  // geometry = new THREE.IcosahedronGeometry(150, 0);
+  // material = new THREE.MeshPhongMaterial({shading: THREE.FlatShading, color: 0xff0000, ambient: 0xffffff, emissive: 0x24479b, specular: 0xfa0000, shininess: 100});
+  // mesh = new THREE.Mesh(geometry, material);
+  // scene.add(mesh);
 
   ambientLight = new THREE.AmbientLight( 0x000000 );
   scene.add( ambientLight );
