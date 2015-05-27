@@ -5,11 +5,70 @@
 <link rel="stylesheet" href="style.css">
   </head>
   <body>
+
+    <audio id="myAudio" src="assets/dr_who.mp3">
+      
+    </audio>
+
+    <div id="keyboard"></div>
     
-    <script src="http://brangerbriz.net/labs/threejs_playGnd/js/three.min.js"></script>
-    <script src="http://brangerbriz.net/labs/threejs_playGnd/js/Detector.js"></script>
-    <script src="app.js"></script>
-    <script src="audio.js"></script>
+    <script src="scripts/three.min.js"></script>
+    <script src="scripts/detector.js"></script>
+
+    <script src="scripts/qwerty-hancock.js"></script>
+
+    <script src="scripts/app.js"></script>
+
+    <script src="scripts/test.js"></script>
+
+    <script>  
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
+      var context = new AudioContext(),
+          settings = {
+              id: 'keyboard',
+              width: 200,
+              height: 50,
+              startNote: 'A2',
+              whiteNotesColour: '#fff',
+              blackNotesColour: '#000',
+              borderColour: '#000',
+              activeColour: 'yellow',
+              octaves: 2
+          },
+          keyboard = new QwertyHancock(settings);
+
+      masterGain = context.createGain();
+      nodes = [];
+
+      masterGain.gain.value = 0.3;
+      masterGain.connect(context.destination); 
+
+      keyboard.keyDown = function (note, frequency) {
+          var oscillator = context.createOscillator();
+          oscillator.type = 'sawtooth';
+          oscillator.frequency.value = frequency;
+          oscillator.connect(masterGain);
+          oscillator.start(0);
+          oscillator.detune.value = 2 * -1000
+          nodes.push(oscillator);
+      };
+
+      keyboard.keyUp = function (note, frequency) {
+          var new_nodes = [];
+
+          for (var i = 0; i < nodes.length; i++) {
+              if (Math.round(nodes[i].frequency.value) === Math.round(frequency)) {
+                  nodes[i].stop(0);
+                  nodes[i].disconnect();
+              } else {
+                  new_nodes.push(nodes[i]);
+              }
+          }
+
+          nodes = new_nodes;
+      };
+  </script>
 
   </body>
 </html>
