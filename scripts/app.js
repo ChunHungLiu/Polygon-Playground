@@ -60,6 +60,18 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 var camera, scene, renderer;
 var geometry, material, mesh;
 
+var points = [
+  new THREE.Vector3( 35.03, 18.67, 59 ),
+  new THREE.Vector3( 41.02, -89.52, -56.53 ),
+  new THREE.Vector3( -1.77, -56.52, 97.48 ),
+  new THREE.Vector3( -2.17, -55.2, -99.59 ),
+  new THREE.Vector3( 30.41, 6.23, 93.24 ),
+  new THREE.Vector3( -2.17, -23.35, 89.44 ),
+  new THREE.Vector3( 85.82, -50.71, 30.72 ),
+  new THREE.Vector3( -78, -1.84, -17.91 ),
+  new THREE.Vector3( -4.11, 96.3, -71.78 ),
+];
+
 function setup() {
 
 
@@ -74,21 +86,14 @@ function setup() {
 
   scene = new THREE.Scene();
 
-  var points = [
-    new THREE.Vector3( 35.03, 18.67, 59 ),
-    new THREE.Vector3( 41.02, -89.52, -56.53 ),
-    new THREE.Vector3( -1.77, -56.52, 97.48 ),
-    new THREE.Vector3( -2.17, -55.2, -99.59 ),
-    new THREE.Vector3( 30.41, 6.23, 93.24 ),
-    new THREE.Vector3( -2.17, -23.35, 89.44 ),
-    new THREE.Vector3( 85.82, -50.71, 30.72 ),
-    new THREE.Vector3( -78, -1.84, -17.91 ),
-    new THREE.Vector3( -4.11, 96.3, -71.78 ),
-  ];
 
   geometry = new THREE.ConvexGeometry( points );
   material = new THREE.MeshNormalMaterial({shading: THREE.FlatShading});
+
+  // mesh takes in geom (which has specified vector points) + material )
   mesh = new THREE.Mesh(geometry, material);
+
+  // addes new mesh object to scene
   scene.add(mesh);
   
   // geometry = new THREE.IcosahedronGeometry(150, 0);
@@ -118,7 +123,17 @@ function setup() {
   spotLight2.castShadow = true;
   spotLight2.shadowDarkness = 0.2;
   scene.add( spotLight2 );
+}
 
+
+function onWindowResize() {
+
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize( window.innerWidth, window.innerHeight );
+
+  controls.handleResize();
 
 }
 
@@ -126,18 +141,12 @@ function draw() {
 
   requestAnimationFrame( draw );
   
-  mesh.rotation.x = Date.now() * 0.0005;  
+  mesh.rotation.x = Date.now() * 0.005;  
   mesh.rotation.y = Date.now() * 0.0002;  
   mesh.rotation.z = Date.now() * 0.0001;
   renderer.render( scene, camera );
-
 }
 
-// setup();
-// draw();
 
-
-
-
-
-
+setup();
+draw();

@@ -6,19 +6,14 @@
   </head>
   <body>
 
-    <audio id="myAudio" src="assets/dr_who.mp3">
-      
-    </audio>
+    
 
     <div id="keyboard"></div>
     
     <script src="scripts/three.min.js"></script>
     <script src="scripts/detector.js"></script>
-
     <script src="scripts/qwerty-hancock.js"></script>
-
     <script src="scripts/app.js"></script>
-
     <script src="scripts/test.js"></script>
 
     <script>  
@@ -39,10 +34,10 @@
           keyboard = new QwertyHancock(settings);
 
       var analyser = context.createAnalyser();
+      analyser.fftsize = 2048;
       analyser.minDecibels = -90;
       analyser.maxDecibels = -10;
       analyser.smoothingTimeConstant = 0.85;
-
 
       masterGain = context.createGain();
       nodes = [];
@@ -62,10 +57,15 @@
 
           oscillator.connect(analyser);
           analyser.connect(context.destination);
-          var times = new Uint8Array(analyser.frequencyBinCount);
-          analyser.getByteTimeDomainData(times);
-          // debugger;
+          
 
+          var bufferLength = analyser.frequencyBinCount
+          var dataArray = new Uint8Array(analyser.frequencyBinCount);
+          analyser.getByteTimeDomainData(dataArray);
+
+          
+
+          debugger;
       };
 
       keyboard.keyUp = function (note, frequency) {
