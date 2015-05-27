@@ -1,6 +1,3 @@
-
-
-
 // AUDIO
 
 // var audioContext = new AudioContext()
@@ -81,33 +78,35 @@ function updateGeometry(){
 
 function setup() {
 
+  //----SETUP ENVIRONMENT----
+  // instantiate the THREE scene
+  scene = new THREE.Scene(); 
 
-
-  var W = window.innerWidth, H = window.innerHeight;
+  // instantiate webGL as the renderer
   renderer = new THREE.WebGLRenderer();
+  // declare and set the width+height of the renderer
+  var W = window.innerWidth, H = window.innerHeight;
   renderer.setSize( W, H );
   document.body.appendChild( renderer.domElement );
 
+  // set the camera perspective
   camera = new THREE.PerspectiveCamera( 80, W/H, 1, 10000 );
   camera.position.z = 300;
+  //-------------------------
 
-  scene = new THREE.Scene();
 
+  // ---SETUP 3d OBJECT -----
 
-  geometry = new THREE.ConvexGeometry( points );
   material = new THREE.MeshNormalMaterial({shading: THREE.FlatShading});
-
-  // mesh takes in geom (which has specified vector points) + material )
+  geometry = new THREE.ConvexGeometry( points );
   mesh = new THREE.Mesh(geometry, material);
-
-  // addes new mesh object to scene
-  scene.add(mesh);
   
-  // geometry = new THREE.IcosahedronGeometry(150, 0);
-  // material = new THREE.MeshPhongMaterial({shading: THREE.FlatShading, color: 0xff0000, ambient: 0xffffff, emissive: 0x24479b, specular: 0xfa0000, shininess: 100});
-  // mesh = new THREE.Mesh(geometry, material);
-  // scene.add(mesh);
+  // addes mesh to the scene
+  scene.add(mesh);
+  // ------------------------
 
+
+  // ------- LIGHTING -------
   ambientLight = new THREE.AmbientLight( 0x000000 );
   scene.add( ambientLight );
 
@@ -130,23 +129,50 @@ function setup() {
   spotLight2.castShadow = true;
   spotLight2.shadowDarkness = 0.2;
   scene.add( spotLight2 );
+  // -----------------------
+
+  // HELPERS
+  // var grid = new THREE.GridHelper(50, 5)
+  // var color = new THREE.Color("RGB(255,0,0)");
+  // scence.add( grid );
+
+  //------datGUI setup------
+  var datGUI = new dat.GUI();
+
+  guiControls = new function() {
+    this.rotationX = 0.005;
+    this.rotationY = 0.005;
+    this.rotationZ = 0.005;
+  }
+
+  datGUI.add(guiControls, 'rotationX', 0, .2);
+  datGUI.add(guiControls, 'rotationY', 0, .2);
+  datGUI.add(guiControls, 'rotationZ', 0, .2);
+  //------------------------
 }
 
+
+
+
+function draw() {
+  // mesh.rotation.x = Date.now() * 0.0005;  
+  // mesh.rotation.y = Date.now() * 0.0002;  
+  // mesh.rotation.z = Date.now() * 0.0001;
+
+  // take rotation values from guiControls
+  mesh.rotation.x += guiControls.rotationX;
+  mesh.rotation.y += guiControls.rotationY;
+  mesh.rotation.z += guiControls.rotationZ;
+
+
+  requestAnimationFrame( draw );
+  renderer.render( scene, camera );
+}
 
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize( window.innerWidth, window.innerHeight );
-}
-
-function draw() {
-
-  requestAnimationFrame( draw );
-  
-  mesh.rotation.x = Date.now() * 0.0005;  
-  mesh.rotation.y = Date.now() * 0.0002;  
-  mesh.rotation.z = Date.now() * 0.0001;
-  renderer.render( scene, camera );
 }
 
 window.addEventListener('resize', onWindowResize, false);
