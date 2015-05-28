@@ -44,11 +44,6 @@ var AxisControlsConstructor = function() {
 var VectorPointConstructor = function() {
 }
 
-var VectorPointPositionConstructor = function(i) {
-  this.vectorX = points[i].x;
-  this.vectorY = points[i].y;
-  this.vectorZ = points[i].z;
-};
 
 var CameraControlsConstructor = function() {
   this.positionX = 50;
@@ -85,18 +80,7 @@ f5.add(cameraControls, 'positionX', -400, 400).listen();
 f5.add(cameraControls, 'positionY', -400, 400).listen();
 f5.add(cameraControls, 'positionZ', -400, 400).listen();
 
-// function buildVectorPointsFolders() {
 
-  for (var i = 0; i < points.length; i++) {
-    var generateFolder = f2.addFolder('Point ' + i);
-
-    // instantiate the controls, loop through and retrieve individual vector points
-    var vectorPointPositionControls = new VectorPointPositionConstructor(i);
-
-    generateFolder.add(vectorPointPositionControls, 'vectorX', -100, 100).listen();
-    generateFolder.add(vectorPointPositionControls, 'vectorY', -100, 100).listen();
-    generateFolder.add(vectorPointPositionControls, 'vectorZ', -100, 100).listen();
-  }
 
 
 // /////////////////////////////////////////////
@@ -107,12 +91,22 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var camera, scene, renderer;
 var geometry, material, mesh;
+var vectorPointPositionControls;
+
+var stuff = [];
+
+var VectorPointPositionConstructor = function(i) {
+  this.vectorX = mesh.geometry.vertices[1].x
+  this.vectorY = mesh.geometry.vertices[1].y
+  this.vectorZ = mesh.geometry.vertices[1].z
+};
+
 
 function updateGeometry(){
   geometry.verticesNeedUpdate = true;
 }
 
-function setup() {
+function setup(context) {
 
   //----SETUP ENVIRONMENT----
   // instantiate the THREE scene
@@ -138,8 +132,22 @@ function setup() {
   geometry = new THREE.ConvexGeometry( points );
   mesh = new THREE.Mesh(geometry, material);
   
+  for (var i = 0; i < points.length; i++) {
+    vectorPointPositionControls = new VectorPointPositionConstructor();
+    stuff.push(vectorPointPositionControls);
+    var generateFolder = f2.addFolder('Point ' + i);
+    generateFolder.add(stuff[i], 'vectorX', -100, 100).listen();
+    // instantiate the controls, loop through and retrieve individual vector points
+
+    // generateFolder.add(vectorPointPositionControls, 'vectorY', -100, 100).listen();
+    // generateFolder.add(vectorPointPositionControls, 'vectorZ', -100, 100).listen();
+  }
   // addes mesh to the scene
+
   scene.add(mesh);
+
+
+
 
   // ------- LIGHTING -------
   ambientLight = new THREE.AmbientLight( 0x000000 );
@@ -231,32 +239,40 @@ function setup() {
       axisControls.rotationY += Math.random() / 500;
       axisControls.rotationZ += Math.random() / 500;
 
-      mesh.geometry.vertices[1].z = dataArray[50] / 10;
-      mesh.geometry.vertices[2].x = dataArray[50] / 10;
-      mesh.geometry.vertices[3].y = dataArray[50] / 10;
+      mesh.geometry.vertices[1].z = dataArray[150] / 5;
+      mesh.geometry.vertices[2].x = dataArray[220] / 10;
+      mesh.geometry.vertices[3].y = dataArray[33] / 30;
+      mesh.geometry.vertices[4].x = dataArray[23] / 13;
+      mesh.geometry.vertices[5].y = dataArray[55] / 13;
+      mesh.geometry.vertices[6].z = dataArray[99] / 40;
+      mesh.geometry.vertices[7].x = dataArray[156] / 10;
 
+      // mesh.geometry.vertices[0].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[0].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[0].y = dataArray[50] / 10;
+      // mesh.geometry.vertices[1].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[1].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[1].y = dataArray[50] / 10;
+      // mesh.geometry.vertices[2].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[2].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[2].y = dataArray[50] / 10;
+      // mesh.geometry.vertices[3].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[3].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[3].y = dataArray[50] / 10;
+      // mesh.geometry.vertices[4].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[4].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[4].y = dataArray[50] / 10;
+      // mesh.geometry.vertices[5].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[5].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[5].y = dataArray[50] / 10;
+      // mesh.geometry.vertices[6].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[6].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[6].y = dataArray[50] / 10;
+      // mesh.geometry.vertices[7].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[7].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[7].y = dataArray[50] / 10;
 
-
-
-      var points = [
-        new THREE.Vector3( randNum(), randNum(), randNum()),
-        new THREE.Vector3( randNum(), randNum(), randNum()),
-        new THREE.Vector3( randNum(), randNum(), randNum()),
-        new THREE.Vector3( randNum(), randNum(), randNum()),
-        new THREE.Vector3( randNum(), randNum(), randNum()),
-        new THREE.Vector3( randNum(), randNum(), randNum()),
-        new THREE.Vector3( randNum(), randNum(), randNum()),
-        new THREE.Vector3( randNum(), randNum(), randNum())
-      ];
-
-
-      for (var i = 0; i < mesh.geometry.vertices.length; i++){
-        // mesh.geometry.vertices[i].x += dataArray[50] / dataArray[25];
-        // mesh.geometry.vertices[i].y += dataArray[50] / dataArray[200];
-        // mesh.geometry.vertices[i].z += dataArray[50] / dataArray[15];
-
-      }
-        updateGeometry();
+      updateGeometry();
 
 
   };
@@ -294,6 +310,16 @@ function draw() {
   camera.position.z = cameraControls.positionZ;
 
   // VECTOR POINTS
+  // console.log(vectorPointPositionControls.vectorX);
+  for(var i=0; i<5; i++) {
+    mesh.geometry.vertices[i].x = stuff[i].vectorX;    
+    // mesh.geometry.vertices[2].x = stuff[2].vectorX;    
+
+  }
+  // mesh.geometry.vertices[1].y = 1000; //vectorPointControls.vectorY;
+  // mesh.geometry.vertices[1].z = vectorPointControls.vectorZ;
+
+  updateGeometry();
   requestAnimationFrame( draw );
   renderer.render( scene, camera );
 }
