@@ -11,83 +11,6 @@
 var dataArray;
 
 
-// /////////////////////////////////////////////
-// /////////////// datGUI setup ////////////////
-// /////////////////////////////////////////////
-
-//Define the controller constructor
-var AxisControlsConstructor = function() {
-  this.rotationX = 0.001;
-  this.rotationY = 0.001;
-  this.rotationZ = 0.001;
-};
-
-var VectorConstructorControls = function() {
-  for (var i = 0; i < 8; i++) {
-    this.vector[i] = [i];
-  };
-}
-
-var VectorPointsConstructor = function() {
-  this.pointPositionX = 0;
-  this.pointPositionY = 0;
-  this.pointPositionZ = 0;
-};
-
-var CameraControlsConstructor = function() {
-  this.positionX = 50;
-  this.positionY = -45;
-  this.positionZ = 300;
-};
-// create the gui
-var gui = new dat.GUI();
-
-// instantiate the controls
-var axisControls = new AxisControlsConstructor();
-var cameraControls = new CameraControlsConstructor();
-var VectorControls = new new VectorConstructorControls();
-var vectorPointControls = new VectorPointsConstructor();
-
-// declare the folder
-var f1 = gui.addFolder('Axit Rotation');
-var f2 = gui.addFolder('Vector Points');
-var f3 = gui.addFolder('Shape Colour');
-var f4 = gui.addFolder('Lighting');
-var f5 = gui.addFolder('Camera');
-var f6 = gui.addFolder('Environment');
-
-// render the folders as open
-f1.open();
-f2.open();
-f3.open();
-f4.open();
-f5.open();
-
-
-// add controls to folder
-f1.add(axisControls, 'rotationX', 0, .2).listen();
-f1.add(axisControls, 'rotationY', 0, .2).listen();
-f1.add(axisControls, 'rotationZ', 0, .2).listen();
-
-f2.add(vectorPointControls, 'pointPositionX', -100, 100).listen();
-f2.add(vectorPointControls, 'pointPositionY', -100, 100).listen();
-f2.add(vectorPointControls, 'pointPositionZ', -100, 100).listen();
-
-f5.add(cameraControls, 'positionX', -400, 400).listen();
-f5.add(cameraControls, 'positionY', -400, 400).listen();
-f5.add(cameraControls, 'positionZ', -400, 400).listen();
-
-
-
-// /////////////////////////////////////////////
-// ///////////////// three.js //////////////////
-// /////////////////////////////////////////////
-
-if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-var camera, scene, renderer;
-var geometry, material, mesh;
-
 // temporary global for vector points
 function randNum(){
   return Math.random() * 201  -100 //range of -100 to 100
@@ -101,8 +24,89 @@ var points = [
   new THREE.Vector3( randNum(), randNum(), randNum()),
   new THREE.Vector3( randNum(), randNum(), randNum()),
   new THREE.Vector3( randNum(), randNum(), randNum()),
+  new THREE.Vector3( randNum(), randNum(), randNum()),
   new THREE.Vector3( randNum(), randNum(), randNum())
 ];
+// --------------------------------------------------------
+
+
+// /////////////////////////////////////////////
+// /////////////// datGUI setup ////////////////
+// /////////////////////////////////////////////
+
+//Define the controller constructor
+var AxisControlsConstructor = function() {
+  this.rotationX = 0.001;
+  this.rotationY = 0.001;
+  this.rotationZ = 0.001;
+};
+
+var VectorPointConstructor = function() {
+}
+
+var VectorPointPositionConstructor = function(i) {
+  this.vectorX = points[i].x;
+  this.vectorY = points[i].y;
+  this.vectorZ = points[i].z;
+};
+
+var CameraControlsConstructor = function() {
+  this.positionX = 50;
+  this.positionY = -45;
+  this.positionZ = 300;
+};
+// create the gui
+var gui = new dat.GUI();
+
+// instantiate the controls
+var axisControls = new AxisControlsConstructor();
+var cameraControls = new CameraControlsConstructor();
+var vectorPointControls = new VectorPointConstructor();
+
+// declare the folder
+var f1 = gui.addFolder('Axit Rotation');
+var f2 = gui.addFolder('Vector Points');
+var f3 = gui.addFolder('Shape Colour');
+var f4 = gui.addFolder('Lighting');
+var f5 = gui.addFolder('Camera');
+var f6 = gui.addFolder('Environment');
+
+// render the folders as open
+f1.open();
+
+f2.open();
+
+// add controls to folder
+f1.add(axisControls, 'rotationX', 0, .2).listen();
+f1.add(axisControls, 'rotationY', 0, .2).listen();
+f1.add(axisControls, 'rotationZ', 0, .2).listen();
+
+f5.add(cameraControls, 'positionX', -400, 400).listen();
+f5.add(cameraControls, 'positionY', -400, 400).listen();
+f5.add(cameraControls, 'positionZ', -400, 400).listen();
+
+// function buildVectorPointsFolders() {
+
+  for (var i = 0; i < points.length; i++) {
+    var generateFolder = f2.addFolder('Point ' + i);
+
+    // instantiate the controls, loop through and retrieve individual vector points
+    var vectorPointPositionControls = new VectorPointPositionConstructor(i);
+
+    generateFolder.add(vectorPointPositionControls, 'vectorX', -100, 100).listen();
+    generateFolder.add(vectorPointPositionControls, 'vectorY', -100, 100).listen();
+    generateFolder.add(vectorPointPositionControls, 'vectorZ', -100, 100).listen();
+  }
+
+
+// /////////////////////////////////////////////
+// ///////////////// three.js //////////////////
+// /////////////////////////////////////////////
+
+if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+var camera, scene, renderer;
+var geometry, material, mesh;
 
 function updateGeometry(){
   geometry.verticesNeedUpdate = true;
@@ -289,8 +293,7 @@ function draw() {
   camera.position.y = cameraControls.positionY;
   camera.position.z = cameraControls.positionZ;
 
-  // take 
-
+  // VECTOR POINTS
   requestAnimationFrame( draw );
   renderer.render( scene, camera );
 }
@@ -302,5 +305,7 @@ function onWindowResize() {
 }
 
 window.addEventListener('resize', onWindowResize, false);
+
+// buildVectorPointsFolders();
 setup();
 draw();
