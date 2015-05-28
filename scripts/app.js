@@ -50,12 +50,33 @@
 
 // ======================================================
 
+
+var dataArray;
+
+
 // THREE.JS
 
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var camera, scene, renderer;
 var geometry, material, mesh;
+
+
+
+  //------datGUI setup------
+
+  var datGUI = new dat.GUI();
+
+  guiControls = new function() {
+    this.rotationX = 0.005;
+    this.rotationY = 0.005;
+    this.rotationZ = 0.005;
+  }
+
+  datGUI.add(guiControls, 'rotationX', 0, .2).listen();
+  datGUI.add(guiControls, 'rotationY', 0, .2).listen();
+  datGUI.add(guiControls, 'rotationZ', 0, .2).listen();
+  //------------------------
 
 var points = [
   new THREE.Vector3( 35.03, 18.67, 59 ),
@@ -73,7 +94,7 @@ var points = [
 
 
 function updateGeometry(){
-  geometry.verticessNeedUpdate = true;
+  geometry.verticesNeedUpdate = true;
 }
 
 function setup() {
@@ -136,34 +157,103 @@ function setup() {
   // var color = new THREE.Color("RGB(255,0,0)");
   // scence.add( grid );
 
-  //------datGUI setup------
-  var datGUI = new dat.GUI();
 
-  guiControls = new function() {
-    this.rotationX = 0.005;
-    this.rotationY = 0.005;
-    this.rotationZ = 0.005;
-  }
+  //------WEB AUDIO API-----
+  window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-  datGUI.add(guiControls, 'rotationX', 0, .2);
-  datGUI.add(guiControls, 'rotationY', 0, .2);
-  datGUI.add(guiControls, 'rotationZ', 0, .2);
+  // instantiating new AudioContext
+  var context = new AudioContext(),
+      settings = {
+          id: 'keyboard',
+          width: 200,
+          height: 50,
+          startNote: 'A2',
+          whiteNotesColour: '#fff',
+          blackNotesColour: '#000',
+          borderColour: '#000',
+          activeColour: 'yellow',
+          octaves: 2
+      },
+      keyboard = new QwertyHancock(settings);
+
+  var analyser = context.createAnalyser();
+  analyser.fftsize = 2048;
+  analyser.minDecibels = -90;
+  analyser.maxDecibels = -10;
+  analyser.smoothingTimeConstant = 0.85;
+
+  
+
+  masterGain = context.createGain();
+  nodes = [];
+
+  masterGain.gain.value = 0.3;
+  masterGain.connect(context.destination); 
+
+  keyboard.keyDown = function (note, frequency) {
+      var oscillator = context.createOscillator();
+      oscillator.type = 'triangle';
+      oscillator.frequency.value = frequency;
+      oscillator.connect(masterGain);
+      oscillator.detune.value = 2
+      oscillator.start(0);
+      nodes.push(oscillator);
+
+
+      oscillator.connect(analyser);
+      analyser.connect(context.destination);
+      
+
+      var bufferLength = analyser.frequencyBinCount
+      var dataArray = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteTimeDomainData(dataArray);
+
+      console.log(dataArray);
+
+      
+      guiControls.rotationX += Math.random() / 100;
+      guiControls.rotationY += Math.random() / 100;
+      guiControls.rotationZ += Math.random() / 100;
+      console.log(dataArray);
+
+      mesh.geometry.vertices[1].z = dataArray[50] / 10;
+      mesh.geometry.vertices[3].x = dataArray[50] / 10;
+      mesh.geometry.vertices[5].y = dataArray[50] / 10;
+
+      for (var i = 0; i < mesh.geometry.vertices.length; i++){
+        // mesh.geometry.vertices[i].x += dataArray[50] / dataArray[25];
+        // mesh.geometry.vertices[i].y += dataArray[50] / dataArray[200];
+        // mesh.geometry.vertices[i].z += dataArray[50] / dataArray[15];
+
+      }
+        updateGeometry();
+
+
+  };
+
+  keyboard.keyUp = function (note, frequency) {
+      var new_nodes = [];
+
+      for (var i = 0; i < nodes.length; i++) {
+          if (Math.round(nodes[i].frequency.value) === Math.round(frequency)) {
+              nodes[i].stop(0);
+              nodes[i].disconnect();
+          } else {
+              new_nodes.push(nodes[i]);
+          }
+      }
+
+      nodes = new_nodes;
+  };
   //------------------------
+
 }
 
-
-
-
 function draw() {
-  // mesh.rotation.x = Date.now() * 0.0005;  
-  // mesh.rotation.y = Date.now() * 0.0002;  
-  // mesh.rotation.z = Date.now() * 0.0001;
-
   // take rotation values from guiControls
   mesh.rotation.x += guiControls.rotationX;
   mesh.rotation.y += guiControls.rotationY;
   mesh.rotation.z += guiControls.rotationZ;
-
 
   requestAnimationFrame( draw );
   renderer.render( scene, camera );
