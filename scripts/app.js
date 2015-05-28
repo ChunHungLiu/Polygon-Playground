@@ -1,6 +1,3 @@
-
-// ======================================================
-
 // global for web audio data
 var dataArray;
 
@@ -12,9 +9,9 @@ var dataArray;
 
 //Define the controller constructor
 var AxisControlsConstructor = function() {
-  this.rotationX = 0.0005;
-  this.rotationY = 0.0005;
-  this.rotationZ = 0.0005;
+  this.rotationX = 0.001;
+  this.rotationY = 0.001;
+  this.rotationZ = 0.001;
 };
 // create the gui
 var gui = new dat.GUI();
@@ -26,19 +23,19 @@ var AxisControls = new AxisControlsConstructor();
 var f1 = gui.addFolder('Axit Rotation')
 
 // add controls to folder
-f1.add(AxisControls, 'rotationX', 0, .2);
-f1.add(AxisControls, 'rotationY', 0, .2);
-f1.add(AxisControls, 'rotationZ', 0, .2);
+f1.add(AxisControls, 'rotationX', 0, .2).listen();
+f1.add(AxisControls, 'rotationY', 0, .2).listen();
+f1.add(AxisControls, 'rotationZ', 0, .2).listen();
 
 // /////////////////////////////////////////////
 // /////////////////////////////////////////////
 
 
 
+// /////////////////////////////////////////////
+// ///////////////// three.js //////////////////
+// /////////////////////////////////////////////
 
-//------------------------
-
-// THREE.JS
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var camera, scene, renderer;
@@ -122,7 +119,14 @@ function setup() {
   // scence.add( grid );
 
 
-  //------WEB AUDIO API-----
+// /////////////////////////////////////////////// 
+// /////////////////////////////////////////////// 
+
+
+// /////////////////////////////////////////////
+// ////////////// Web Audio API ////////////////
+// /////////////////////////////////////////////
+
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
   // instantiating new AudioContext
@@ -145,8 +149,6 @@ function setup() {
   analyser.minDecibels = -90;
   analyser.maxDecibels = -10;
   analyser.smoothingTimeConstant = 0.85;
-
-  
 
   masterGain = context.createGain();
   nodes = [];
@@ -209,9 +211,17 @@ function setup() {
 
       nodes = new_nodes;
   };
-  //------------------------
 
 }
+// /////////////////////////////////////////////
+// /////////////////////////////////////////////
+
+
+
+
+// /////////////////////////////////////////////
+// //////////// Render 3d on page //////////////
+// /////////////////////////////////////////////
 
 function draw() {
   // take rotation values from AxisControls
@@ -232,3 +242,7 @@ function onWindowResize() {
 window.addEventListener('resize', onWindowResize, false);
 setup();
 draw();
+
+
+// /////////////////////////////////////////////
+// /////////////////////////////////////////////
