@@ -5,33 +5,30 @@
 var dataArray;
 
 
-
-
-
 // /////////////////////////////////////////////
 // /////////////// datGUI setup ////////////////
 // /////////////////////////////////////////////
 
 
-// Define the controls
-guiControls = new function() {
-  this.rotationX = 0.005;
-  this.rotationY = 0.005;
-  this.rotationZ = 0.005;
-}
+//Define the controller constructor
+var AxisControlsConstructor = function() {
+  this.rotationX = 0.0005;
+  this.rotationY = 0.0005;
+  this.rotationZ = 0.0005;
+};
+// create the gui
+var gui = new dat.GUI();
 
-// create GUI
-var datGUI = new dat.GUI();
+// instantiate the controls
+var AxisControls = new AxisControlsConstructor();
 
-var xRotation = datGUI.add(guiControls, 'rotationX', 0, .2).listen();
-var yRotation = datGUI.add(guiControls, 'rotationY', 0, .2).listen();
-var zRotation = datGUI.add(guiControls, 'rotationZ', 0, .2).listen();
+// declare the folder
+var f1 = gui.addFolder('Axit Rotation')
 
-// /////////////////////////////////////////////
-// /////////////// datGUI setup ////////////////
-// /////////////////////////////////////////////
-
-// create the GUI
+// add controls to folder
+f1.add(AxisControls, 'rotationX', 0, .2);
+f1.add(AxisControls, 'rotationY', 0, .2);
+f1.add(AxisControls, 'rotationZ', 0, .2);
 
 // /////////////////////////////////////////////
 // /////////////////////////////////////////////
@@ -178,9 +175,9 @@ function setup() {
       console.log(dataArray);
 
       
-      guiControls.rotationX += Math.random() / 500;
-      guiControls.rotationY += Math.random() / 500;
-      guiControls.rotationZ += Math.random() / 500;
+      AxisControls.rotationX += Math.random() / 500;
+      AxisControls.rotationY += Math.random() / 500;
+      AxisControls.rotationZ += Math.random() / 500;
       console.log(dataArray);
 
       mesh.geometry.vertices[1].z = dataArray[50] / 10;
@@ -217,10 +214,10 @@ function setup() {
 }
 
 function draw() {
-  // take rotation values from guiControls
-  mesh.rotation.x += guiControls.rotationX;
-  mesh.rotation.y += guiControls.rotationY;
-  mesh.rotation.z += guiControls.rotationZ;
+  // take rotation values from AxisControls
+  mesh.rotation.x += AxisControls.rotationX;
+  mesh.rotation.y += AxisControls.rotationY;
+  mesh.rotation.z += AxisControls.rotationZ;
 
   requestAnimationFrame( draw );
   renderer.render( scene, camera );
