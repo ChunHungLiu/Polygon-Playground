@@ -36,6 +36,12 @@ var f3 = gui.addFolder('Shape Colour');
 var f4 = gui.addFolder('Lighting');
 var f5 = gui.addFolder('Camera');
 
+// render the folders as open
+f1.open();
+f2.open();
+f3.open();
+f4.open();
+f5.open();
 
 
 // add controls to folder
