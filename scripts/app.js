@@ -6,29 +6,46 @@ var dataArray;
 // /////////////// datGUI setup ////////////////
 // /////////////////////////////////////////////
 
-
 //Define the controller constructor
 var AxisControlsConstructor = function() {
   this.rotationX = 0.001;
   this.rotationY = 0.001;
   this.rotationZ = 0.001;
 };
+
+var GeometryControlsConstructor = function() {
+
+};
+
+var CameraControlsConstructor = function() {
+  this.positionX = 0;
+  this.positionY = 0;
+  this.positionZ = 300;
+};
 // create the gui
 var gui = new dat.GUI();
 
 // instantiate the controls
-var AxisControls = new AxisControlsConstructor();
+var axisControls = new AxisControlsConstructor();
+var cameraControls = new CameraControlsConstructor();
 
 // declare the folder
-var f1 = gui.addFolder('Axit Rotation')
+var f1 = gui.addFolder('Axit Rotation');
+var f2 = gui.addFolder('Vector Points');
+var f3 = gui.addFolder('Shape Colour');
+var f4 = gui.addFolder('Lighting');
+var f5 = gui.addFolder('Camera');
+
+
 
 // add controls to folder
-f1.add(AxisControls, 'rotationX', 0, .2).listen();
-f1.add(AxisControls, 'rotationY', 0, .2).listen();
-f1.add(AxisControls, 'rotationZ', 0, .2).listen();
+f1.add(axisControls, 'rotationX', 0, .2).listen();
+f1.add(axisControls, 'rotationY', 0, .2).listen();
+f1.add(axisControls, 'rotationZ', 0, .2).listen();
 
-// /////////////////////////////////////////////
-// /////////////////////////////////////////////
+f5.add(cameraControls, 'positionX', 0, 400).listen();
+f5.add(cameraControls, 'positionY', 0, 400).listen();
+f5.add(cameraControls, 'positionZ', 0, 400).listen();
 
 
 
@@ -74,7 +91,6 @@ function setup() {
   // set the camera perspective
   camera = new THREE.PerspectiveCamera( 80, W/H, 1, 10000 );
   camera.position.z = 300;
-  //-------------------------
 
 
   // ---SETUP 3d OBJECT -----
@@ -85,8 +101,6 @@ function setup() {
   
   // addes mesh to the scene
   scene.add(mesh);
-  // ------------------------
-
 
   // ------- LIGHTING -------
   ambientLight = new THREE.AmbientLight( 0x000000 );
@@ -117,11 +131,6 @@ function setup() {
   // var grid = new THREE.GridHelper(50, 5)
   // var color = new THREE.Color("RGB(255,0,0)");
   // scence.add( grid );
-
-
-// /////////////////////////////////////////////// 
-// /////////////////////////////////////////////// 
-
 
 // /////////////////////////////////////////////
 // ////////////// Web Audio API ////////////////
@@ -176,10 +185,11 @@ function setup() {
 
       console.log(dataArray);
 
+      // Change object properties on keydown from analyzer data
       
-      AxisControls.rotationX += Math.random() / 500;
-      AxisControls.rotationY += Math.random() / 500;
-      AxisControls.rotationZ += Math.random() / 500;
+      axisControls.rotationX += Math.random() / 500;
+      axisControls.rotationY += Math.random() / 500;
+      axisControls.rotationZ += Math.random() / 500;
       console.log(dataArray);
 
       mesh.geometry.vertices[1].z = dataArray[50] / 10;
@@ -213,21 +223,21 @@ function setup() {
   };
 
 }
-// /////////////////////////////////////////////
-// /////////////////////////////////////////////
-
-
-
 
 // /////////////////////////////////////////////
 // //////////// Render 3d on page //////////////
 // /////////////////////////////////////////////
 
 function draw() {
-  // take rotation values from AxisControls
-  mesh.rotation.x += AxisControls.rotationX;
-  mesh.rotation.y += AxisControls.rotationY;
-  mesh.rotation.z += AxisControls.rotationZ;
+  // take rotation values from datGUI axisControls
+  mesh.rotation.x += axisControls.rotationX;
+  mesh.rotation.y += axisControls.rotationY;
+  mesh.rotation.z += axisControls.rotationZ;
+
+  // take camera values from datGUI cameraControls
+  camera.position.x = cameraControls.positionX;
+  camera.position.y = cameraControls.positionY;
+  camera.position.z = cameraControls.positionZ;
 
   requestAnimationFrame( draw );
   renderer.render( scene, camera );
@@ -242,7 +252,3 @@ function onWindowResize() {
 window.addEventListener('resize', onWindowResize, false);
 setup();
 draw();
-
-
-// /////////////////////////////////////////////
-// /////////////////////////////////////////////
