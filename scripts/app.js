@@ -1,83 +1,53 @@
-// AUDIO
-
-// var audioContext = new AudioContext()
-
-// play(0.5, 1, 0.35)
-// play(1, 2, 0.35)
-// play(1.5, 4, 0.35)
-// play(2, 8, 0.35)
-// play(2.5, 20, 0.35)
-// play(3, 8, 0.35)
-// play(3.5, 4, 0.35)
-// play(4, 2, 0.35)
-
-
-// play(12.8, 1, 0.2)
-// play(13.1, 2, 0.2)
-// play(13.4, 4, 0.2)
-// play(13.7, 8, 0.2)
-// play(14, 20, 0.2)
-// play(14.3, 8, 0.2)
-// play(14.6, 4, 0.2)
-// play(14.9, 2, 0.2)
-
-
-// function play(startAfter, pitch, duration) {
-//   var time = audioContext.currentTime + startAfter
-
-//   var oscillator = audioContext.createOscillator()
-//   oscillator.connect(audioContext.destination) // change output
-
-//   oscillator.type = 'sine'
-//   oscillator.detune.value = pitch * 100 
-
-//   oscillator.start(time)
-//   oscillator.stop(time + duration)
-// }
-
-// var audioContext = new AudioContext()
-
-
-
-
-// var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-// var analyser = audioCtx.createAnalyser();
-
-// source = audioCtx.createMediaStreamSource(stream);
-// source.connect(analyser);
-// analyser.connect(distortion);
-
 
 // ======================================================
 
-
+// global for web audio data
 var dataArray;
 
 
-// THREE.JS
 
+
+
+// /////////////////////////////////////////////
+// /////////////// datGUI setup ////////////////
+// /////////////////////////////////////////////
+
+
+// Define the controls
+guiControls = new function() {
+  this.rotationX = 0.005;
+  this.rotationY = 0.005;
+  this.rotationZ = 0.005;
+}
+
+// create GUI
+var datGUI = new dat.GUI();
+
+var xRotation = datGUI.add(guiControls, 'rotationX', 0, .2).listen();
+var yRotation = datGUI.add(guiControls, 'rotationY', 0, .2).listen();
+var zRotation = datGUI.add(guiControls, 'rotationZ', 0, .2).listen();
+
+// /////////////////////////////////////////////
+// /////////////// datGUI setup ////////////////
+// /////////////////////////////////////////////
+
+// create the GUI
+
+// /////////////////////////////////////////////
+// /////////////////////////////////////////////
+
+
+
+
+//------------------------
+
+// THREE.JS
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var camera, scene, renderer;
 var geometry, material, mesh;
 
-
-
-  //------datGUI setup------
-
-  var datGUI = new dat.GUI();
-
-  guiControls = new function() {
-    this.rotationX = 0.005;
-    this.rotationY = 0.005;
-    this.rotationZ = 0.005;
-  }
-
-  datGUI.add(guiControls, 'rotationX', 0, .2).listen();
-  datGUI.add(guiControls, 'rotationY', 0, .2).listen();
-  datGUI.add(guiControls, 'rotationZ', 0, .2).listen();
-  //------------------------
-
+// temporary global for vector points
 var points = [
   new THREE.Vector3( 35.03, 18.67, 59 ),
   new THREE.Vector3( 41.02, -89.52, -56.53 ),
@@ -89,9 +59,6 @@ var points = [
   new THREE.Vector3( -78, -1.84, -17.91 ),
   new THREE.Vector3( -4.11, 96.3, -71.78 ),
 ];
-
-// [16:49] <bai> the basics of it are just that you need to set geometry.verticessNeedUpdate = true whenever they change, and that yes, if you're not calling your render functio in a loop then you'll need to call that too
-
 
 function updateGeometry(){
   geometry.verticesNeedUpdate = true;
@@ -211,9 +178,9 @@ function setup() {
       console.log(dataArray);
 
       
-      guiControls.rotationX += Math.random() / 100;
-      guiControls.rotationY += Math.random() / 100;
-      guiControls.rotationZ += Math.random() / 100;
+      guiControls.rotationX += Math.random() / 500;
+      guiControls.rotationY += Math.random() / 500;
+      guiControls.rotationZ += Math.random() / 500;
       console.log(dataArray);
 
       mesh.geometry.vertices[1].z = dataArray[50] / 10;
