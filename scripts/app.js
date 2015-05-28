@@ -10,23 +10,17 @@
 // global for web audio data
 var dataArray;
 
-
-// temporary global for vector points
-function randNum(){
-  return Math.random() * 201  -100 //range of -100 to 100
-}
-
-var points = [
-  new THREE.Vector3( randNum(), randNum(), randNum()),
-  new THREE.Vector3( randNum(), randNum(), randNum()),
-  new THREE.Vector3( randNum(), randNum(), randNum()),
-  new THREE.Vector3( randNum(), randNum(), randNum()),
-  new THREE.Vector3( randNum(), randNum(), randNum()),
-  new THREE.Vector3( randNum(), randNum(), randNum()),
-  new THREE.Vector3( randNum(), randNum(), randNum()),
-  new THREE.Vector3( randNum(), randNum(), randNum()),
-  new THREE.Vector3( randNum(), randNum(), randNum())
-];
+  var points = [
+    new THREE.Vector3( 78.44, 54.07, -60.01 ),
+    new THREE.Vector3( 56.27, -26.38, 12.46 ),
+    new THREE.Vector3( -20.05, 28.56, 29.04 ),
+    new THREE.Vector3( 81.05, 96.49, 73.14 ),
+    new THREE.Vector3( -15.11, 17.76, 48.29 ),
+    new THREE.Vector3( 19.41, 33.28, 15.8 ),
+    new THREE.Vector3( -63.28, -84.1, -74.08 ),
+    new THREE.Vector3( -38.67, -91.75, -10.46 ),
+    new THREE.Vector3( -62.22, -33.21, -52 ),
+  ];
 // --------------------------------------------------------
 
 
@@ -137,6 +131,8 @@ function setup(context) {
     stuff.push(vectorPointPositionControls);
     var generateFolder = f2.addFolder('Point ' + i);
     generateFolder.add(stuff[i], 'vectorX', -100, 100).listen();
+    generateFolder.add(stuff[i], 'vectorY', -100, 100).listen();
+    generateFolder.add(stuff[i], 'vectorZ', -100, 100).listen();
     // instantiate the controls, loop through and retrieve individual vector points
 
     // generateFolder.add(vectorPointPositionControls, 'vectorY', -100, 100).listen();
@@ -311,13 +307,12 @@ function draw() {
 
   // VECTOR POINTS
   // console.log(vectorPointPositionControls.vectorX);
-  for(var i=0; i<5; i++) {
+  for(var i=0; i<3; i++) {
     mesh.geometry.vertices[i].x = stuff[i].vectorX;    
-    // mesh.geometry.vertices[2].x = stuff[2].vectorX;    
+    mesh.geometry.vertices[i].y = stuff[i].vectorY; 
+    mesh.geometry.vertices[i].z = stuff[i].vectorX; 
 
   }
-  // mesh.geometry.vertices[1].y = 1000; //vectorPointControls.vectorY;
-  // mesh.geometry.vertices[1].z = vectorPointControls.vectorZ;
 
   updateGeometry();
   requestAnimationFrame( draw );
