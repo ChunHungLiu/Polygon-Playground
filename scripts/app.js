@@ -1,83 +1,47 @@
-// AUDIO
-
-// var audioContext = new AudioContext()
-
-// play(0.5, 1, 0.35)
-// play(1, 2, 0.35)
-// play(1.5, 4, 0.35)
-// play(2, 8, 0.35)
-// play(2.5, 20, 0.35)
-// play(3, 8, 0.35)
-// play(3.5, 4, 0.35)
-// play(4, 2, 0.35)
-
-
-// play(12.8, 1, 0.2)
-// play(13.1, 2, 0.2)
-// play(13.4, 4, 0.2)
-// play(13.7, 8, 0.2)
-// play(14, 20, 0.2)
-// play(14.3, 8, 0.2)
-// play(14.6, 4, 0.2)
-// play(14.9, 2, 0.2)
-
-
-// function play(startAfter, pitch, duration) {
-//   var time = audioContext.currentTime + startAfter
-
-//   var oscillator = audioContext.createOscillator()
-//   oscillator.connect(audioContext.destination) // change output
-
-//   oscillator.type = 'sine'
-//   oscillator.detune.value = pitch * 100 
-
-//   oscillator.start(time)
-//   oscillator.stop(time + duration)
-// }
-
-// var audioContext = new AudioContext()
-
-
-
-
-// var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-// var analyser = audioCtx.createAnalyser();
-
-// source = audioCtx.createMediaStreamSource(stream);
-// source.connect(analyser);
-// analyser.connect(distortion);
-
-
-// ======================================================
-
-
+// global for web audio data
 var dataArray;
 
 
-// THREE.JS
+// /////////////////////////////////////////////
+// /////////////// datGUI setup ////////////////
+// /////////////////////////////////////////////
+
+
+//Define the controller constructor
+var AxisControlsConstructor = function() {
+  this.rotationX = 0.001;
+  this.rotationY = 0.001;
+  this.rotationZ = 0.001;
+};
+// create the gui
+var gui = new dat.GUI();
+
+// instantiate the controls
+var AxisControls = new AxisControlsConstructor();
+
+// declare the folder
+var f1 = gui.addFolder('Axit Rotation')
+
+// add controls to folder
+f1.add(AxisControls, 'rotationX', 0, .2).listen();
+f1.add(AxisControls, 'rotationY', 0, .2).listen();
+f1.add(AxisControls, 'rotationZ', 0, .2).listen();
+
+// /////////////////////////////////////////////
+// /////////////////////////////////////////////
+
+
+
+// /////////////////////////////////////////////
+// ///////////////// three.js //////////////////
+// /////////////////////////////////////////////
 
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var camera, scene, renderer;
 var geometry, material, mesh;
 
-
-
-  //------datGUI setup------
-
-  var datGUI = new dat.GUI();
-
-  guiControls = new function() {
-    this.rotationX = 0.005;
-    this.rotationY = 0.005;
-    this.rotationZ = 0.005;
-  }
-
-  datGUI.add(guiControls, 'rotationX', 0, .2).listen();
-  datGUI.add(guiControls, 'rotationY', 0, .2).listen();
-  datGUI.add(guiControls, 'rotationZ', 0, .2).listen();
-  //------------------------
-
+// temporary global for vector points
 var points = [
   new THREE.Vector3( 35.03, 18.67, 59 ),
   new THREE.Vector3( 41.02, -89.52, -56.53 ),
@@ -89,9 +53,6 @@ var points = [
   new THREE.Vector3( -78, -1.84, -17.91 ),
   new THREE.Vector3( -4.11, 96.3, -71.78 ),
 ];
-
-// [16:49] <bai> the basics of it are just that you need to set geometry.verticessNeedUpdate = true whenever they change, and that yes, if you're not calling your render functio in a loop then you'll need to call that too
-
 
 function updateGeometry(){
   geometry.verticesNeedUpdate = true;
@@ -158,7 +119,14 @@ function setup() {
   // scence.add( grid );
 
 
-  //------WEB AUDIO API-----
+// /////////////////////////////////////////////// 
+// /////////////////////////////////////////////// 
+
+
+// /////////////////////////////////////////////
+// ////////////// Web Audio API ////////////////
+// /////////////////////////////////////////////
+
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
   // instantiating new AudioContext
@@ -181,8 +149,6 @@ function setup() {
   analyser.minDecibels = -90;
   analyser.maxDecibels = -10;
   analyser.smoothingTimeConstant = 0.85;
-
-  
 
   masterGain = context.createGain();
   nodes = [];
@@ -211,9 +177,9 @@ function setup() {
       console.log(dataArray);
 
       
-      guiControls.rotationX += Math.random() / 100;
-      guiControls.rotationY += Math.random() / 100;
-      guiControls.rotationZ += Math.random() / 100;
+      AxisControls.rotationX += Math.random() / 500;
+      AxisControls.rotationY += Math.random() / 500;
+      AxisControls.rotationZ += Math.random() / 500;
       console.log(dataArray);
 
       mesh.geometry.vertices[1].z = dataArray[50] / 10;
@@ -245,15 +211,23 @@ function setup() {
 
       nodes = new_nodes;
   };
-  //------------------------
 
 }
+// /////////////////////////////////////////////
+// /////////////////////////////////////////////
+
+
+
+
+// /////////////////////////////////////////////
+// //////////// Render 3d on page //////////////
+// /////////////////////////////////////////////
 
 function draw() {
-  // take rotation values from guiControls
-  mesh.rotation.x += guiControls.rotationX;
-  mesh.rotation.y += guiControls.rotationY;
-  mesh.rotation.z += guiControls.rotationZ;
+  // take rotation values from AxisControls
+  mesh.rotation.x += AxisControls.rotationX;
+  mesh.rotation.y += AxisControls.rotationY;
+  mesh.rotation.z += AxisControls.rotationZ;
 
   requestAnimationFrame( draw );
   renderer.render( scene, camera );
@@ -268,3 +242,7 @@ function onWindowResize() {
 window.addEventListener('resize', onWindowResize, false);
 setup();
 draw();
+
+
+// /////////////////////////////////////////////
+// /////////////////////////////////////////////
