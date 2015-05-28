@@ -310,7 +310,7 @@ function draw() {
   for(var i=0; i<3; i++) {
     mesh.geometry.vertices[i].x = stuff[i].vectorX;    
     mesh.geometry.vertices[i].y = stuff[i].vectorY; 
-    mesh.geometry.vertices[i].z = stuff[i].vectorX; 
+    mesh.geometry.vertices[i].z = stuff[i].vectorZ; 
 
   }
 
