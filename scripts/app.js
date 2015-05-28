@@ -1,11 +1,38 @@
+// Shapes which can be used later
+
+// new THREE.CubeGeometry(200, 200, 200);
+// new THREE.SphereGeometry(150, 100, 100);
+// new THREE.IcosahedronGeometry(136.88, 0);
+// new THREE.TorusGeometry(100, 40, 40, 40, 6.28);
+// new THREE.TorusKnotGeometry(100, 40, 64, 8, 2, 3, 1);
+
+
 // global for web audio data
 var dataArray;
+
+
+// temporary global for vector points
+function randNum(){
+  return Math.random() * 201  -100 //range of -100 to 100
+}
+
+var points = [
+  new THREE.Vector3( randNum(), randNum(), randNum()),
+  new THREE.Vector3( randNum(), randNum(), randNum()),
+  new THREE.Vector3( randNum(), randNum(), randNum()),
+  new THREE.Vector3( randNum(), randNum(), randNum()),
+  new THREE.Vector3( randNum(), randNum(), randNum()),
+  new THREE.Vector3( randNum(), randNum(), randNum()),
+  new THREE.Vector3( randNum(), randNum(), randNum()),
+  new THREE.Vector3( randNum(), randNum(), randNum()),
+  new THREE.Vector3( randNum(), randNum(), randNum())
+];
+// --------------------------------------------------------
 
 
 // /////////////////////////////////////////////
 // /////////////// datGUI setup ////////////////
 // /////////////////////////////////////////////
-
 
 //Define the controller constructor
 var AxisControlsConstructor = function() {
@@ -13,22 +40,46 @@ var AxisControlsConstructor = function() {
   this.rotationY = 0.001;
   this.rotationZ = 0.001;
 };
+
+var VectorPointConstructor = function() {
+}
+
+
+var CameraControlsConstructor = function() {
+  this.positionX = 50;
+  this.positionY = -45;
+  this.positionZ = 300;
+};
 // create the gui
 var gui = new dat.GUI();
 
 // instantiate the controls
-var AxisControls = new AxisControlsConstructor();
+var axisControls = new AxisControlsConstructor();
+var cameraControls = new CameraControlsConstructor();
+var vectorPointControls = new VectorPointConstructor();
 
 // declare the folder
-var f1 = gui.addFolder('Axit Rotation')
+var f1 = gui.addFolder('Axit Rotation');
+var f2 = gui.addFolder('Vector Points');
+var f3 = gui.addFolder('Shape Colour');
+var f4 = gui.addFolder('Lighting');
+var f5 = gui.addFolder('Camera');
+var f6 = gui.addFolder('Environment');
+
+// render the folders as open
+f1.open();
+
+f2.open();
 
 // add controls to folder
-f1.add(AxisControls, 'rotationX', 0, .2).listen();
-f1.add(AxisControls, 'rotationY', 0, .2).listen();
-f1.add(AxisControls, 'rotationZ', 0, .2).listen();
+f1.add(axisControls, 'rotationX', 0, .2).listen();
+f1.add(axisControls, 'rotationY', 0, .2).listen();
+f1.add(axisControls, 'rotationZ', 0, .2).listen();
 
-// /////////////////////////////////////////////
-// /////////////////////////////////////////////
+f5.add(cameraControls, 'positionX', -400, 400).listen();
+f5.add(cameraControls, 'positionY', -400, 400).listen();
+f5.add(cameraControls, 'positionZ', -400, 400).listen();
+
 
 
 
@@ -40,25 +91,22 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var camera, scene, renderer;
 var geometry, material, mesh;
+var vectorPointPositionControls;
 
-// temporary global for vector points
-var points = [
-  new THREE.Vector3( 35.03, 18.67, 59 ),
-  new THREE.Vector3( 41.02, -89.52, -56.53 ),
-  new THREE.Vector3( -1.77, -56.52, 97.48 ),
-  new THREE.Vector3( -2.17, -55.2, -99.59 ),
-  new THREE.Vector3( 30.41, 6.23, 93.24 ),
-  new THREE.Vector3( -2.17, -23.35, 89.44 ),
-  new THREE.Vector3( 85.82, -50.71, 30.72 ),
-  new THREE.Vector3( -78, -1.84, -17.91 ),
-  new THREE.Vector3( -4.11, 96.3, -71.78 ),
-];
+var stuff = [];
+
+var VectorPointPositionConstructor = function(i) {
+  this.vectorX = mesh.geometry.vertices[1].x
+  this.vectorY = mesh.geometry.vertices[1].y
+  this.vectorZ = mesh.geometry.vertices[1].z
+};
+
 
 function updateGeometry(){
   geometry.verticesNeedUpdate = true;
 }
 
-function setup() {
+function setup(context) {
 
   //----SETUP ENVIRONMENT----
   // instantiate the THREE scene
@@ -66,6 +114,10 @@ function setup() {
 
   // instantiate webGL as the renderer
   renderer = new THREE.WebGLRenderer();
+
+  renderer.setClearColor( 0xADD8E6 );
+
+
   // declare and set the width+height of the renderer
   var W = window.innerWidth, H = window.innerHeight;
   renderer.setSize( W, H );
@@ -73,9 +125,6 @@ function setup() {
 
   // set the camera perspective
   camera = new THREE.PerspectiveCamera( 80, W/H, 1, 10000 );
-  camera.position.z = 300;
-  //-------------------------
-
 
   // ---SETUP 3d OBJECT -----
 
@@ -83,9 +132,21 @@ function setup() {
   geometry = new THREE.ConvexGeometry( points );
   mesh = new THREE.Mesh(geometry, material);
   
+  for (var i = 0; i < points.length; i++) {
+    vectorPointPositionControls = new VectorPointPositionConstructor();
+    stuff.push(vectorPointPositionControls);
+    var generateFolder = f2.addFolder('Point ' + i);
+    generateFolder.add(stuff[i], 'vectorX', -100, 100).listen();
+    // instantiate the controls, loop through and retrieve individual vector points
+
+    // generateFolder.add(vectorPointPositionControls, 'vectorY', -100, 100).listen();
+    // generateFolder.add(vectorPointPositionControls, 'vectorZ', -100, 100).listen();
+  }
   // addes mesh to the scene
+
   scene.add(mesh);
-  // ------------------------
+
+
 
 
   // ------- LIGHTING -------
@@ -117,11 +178,6 @@ function setup() {
   // var grid = new THREE.GridHelper(50, 5)
   // var color = new THREE.Color("RGB(255,0,0)");
   // scence.add( grid );
-
-
-// /////////////////////////////////////////////// 
-// /////////////////////////////////////////////// 
-
 
 // /////////////////////////////////////////////
 // ////////////// Web Audio API ////////////////
@@ -176,23 +232,47 @@ function setup() {
 
       console.log(dataArray);
 
-      
-      AxisControls.rotationX += Math.random() / 500;
-      AxisControls.rotationY += Math.random() / 500;
-      AxisControls.rotationZ += Math.random() / 500;
+      // Change object properties on keydown from analyzer data
       console.log(dataArray);
+      
+      axisControls.rotationX += Math.random() / 500;
+      axisControls.rotationY += Math.random() / 500;
+      axisControls.rotationZ += Math.random() / 500;
 
-      mesh.geometry.vertices[1].z = dataArray[50] / 10;
-      mesh.geometry.vertices[3].x = dataArray[50] / 10;
-      mesh.geometry.vertices[5].y = dataArray[50] / 10;
+      mesh.geometry.vertices[1].z = dataArray[150] / 5;
+      mesh.geometry.vertices[2].x = dataArray[220] / 10;
+      mesh.geometry.vertices[3].y = dataArray[33] / 30;
+      mesh.geometry.vertices[4].x = dataArray[23] / 13;
+      mesh.geometry.vertices[5].y = dataArray[55] / 13;
+      mesh.geometry.vertices[6].z = dataArray[99] / 40;
+      mesh.geometry.vertices[7].x = dataArray[156] / 10;
 
-      for (var i = 0; i < mesh.geometry.vertices.length; i++){
-        // mesh.geometry.vertices[i].x += dataArray[50] / dataArray[25];
-        // mesh.geometry.vertices[i].y += dataArray[50] / dataArray[200];
-        // mesh.geometry.vertices[i].z += dataArray[50] / dataArray[15];
+      // mesh.geometry.vertices[0].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[0].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[0].y = dataArray[50] / 10;
+      // mesh.geometry.vertices[1].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[1].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[1].y = dataArray[50] / 10;
+      // mesh.geometry.vertices[2].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[2].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[2].y = dataArray[50] / 10;
+      // mesh.geometry.vertices[3].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[3].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[3].y = dataArray[50] / 10;
+      // mesh.geometry.vertices[4].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[4].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[4].y = dataArray[50] / 10;
+      // mesh.geometry.vertices[5].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[5].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[5].y = dataArray[50] / 10;
+      // mesh.geometry.vertices[6].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[6].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[6].y = dataArray[50] / 10;
+      // mesh.geometry.vertices[7].z = dataArray[50] / 10;
+      // mesh.geometry.vertices[7].x = dataArray[50] / 10;
+      // mesh.geometry.vertices[7].y = dataArray[50] / 10;
 
-      }
-        updateGeometry();
+      updateGeometry();
 
 
   };
@@ -213,22 +293,33 @@ function setup() {
   };
 
 }
-// /////////////////////////////////////////////
-// /////////////////////////////////////////////
-
-
-
 
 // /////////////////////////////////////////////
 // //////////// Render 3d on page //////////////
 // /////////////////////////////////////////////
 
 function draw() {
-  // take rotation values from AxisControls
-  mesh.rotation.x += AxisControls.rotationX;
-  mesh.rotation.y += AxisControls.rotationY;
-  mesh.rotation.z += AxisControls.rotationZ;
+  // take rotation values from datGUI axisControls
+  mesh.rotation.x += axisControls.rotationX;
+  mesh.rotation.y += axisControls.rotationY;
+  mesh.rotation.z += axisControls.rotationZ;
 
+  // take camera values from datGUI cameraControls
+  camera.position.x = cameraControls.positionX;
+  camera.position.y = cameraControls.positionY;
+  camera.position.z = cameraControls.positionZ;
+
+  // VECTOR POINTS
+  // console.log(vectorPointPositionControls.vectorX);
+  for(var i=0; i<5; i++) {
+    mesh.geometry.vertices[i].x = stuff[i].vectorX;    
+    // mesh.geometry.vertices[2].x = stuff[2].vectorX;    
+
+  }
+  // mesh.geometry.vertices[1].y = 1000; //vectorPointControls.vectorY;
+  // mesh.geometry.vertices[1].z = vectorPointControls.vectorZ;
+
+  updateGeometry();
   requestAnimationFrame( draw );
   renderer.render( scene, camera );
 }
@@ -240,9 +331,7 @@ function onWindowResize() {
 }
 
 window.addEventListener('resize', onWindowResize, false);
+
+// buildVectorPointsFolders();
 setup();
 draw();
-
-
-// /////////////////////////////////////////////
-// /////////////////////////////////////////////
