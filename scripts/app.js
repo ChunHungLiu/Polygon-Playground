@@ -61,9 +61,9 @@ var f5 = gui.addFolder('Camera');
 var f6 = gui.addFolder('Environment');
 
 // render the folders as open
-f1.open();
+// f1.open();
 
-f2.open();
+// f2.open();
 
 // add controls to folder
 f1.add(axisControls, 'rotationX', 0, .2).listen();
