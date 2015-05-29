@@ -11,9 +11,9 @@
 var dataArray;
 
   var points = [
-    new THREE.Vector3( 78.44, 54.07, -60.01 ),
+    new THREE.Vector3( 78.44, 1, -60.01 ),
     new THREE.Vector3( 56.27, -26.38, 12.46 ),
-    new THREE.Vector3( -20.05, 28.56, 29.04 ),
+    new THREE.Vector3( -20.05, 80.56, 29.04 ),
     new THREE.Vector3( 81.05, 96.49, 73.14 ),
     new THREE.Vector3( -15.11, 17.76, 48.29 ),
     new THREE.Vector3( 19.41, 33.28, 15.8 ),
@@ -42,7 +42,7 @@ var VectorPointConstructor = function() {
 var CameraControlsConstructor = function() {
   this.positionX = 50;
   this.positionY = -45;
-  this.positionZ = 300;
+  this.positionZ = 400;
 };
 // create the gui
 var gui = new dat.GUI();
@@ -118,7 +118,7 @@ function setup(context) {
   document.body.appendChild( renderer.domElement );
 
   // set the camera perspective
-  camera = new THREE.PerspectiveCamera( 80, W/H, 1, 10000 );
+  camera = new THREE.PerspectiveCamera( 50, W/H, 1, 10000 );
 
   // ---SETUP 3d OBJECT -----
 
@@ -190,8 +190,8 @@ function setup(context) {
           startNote: 'A2',
           whiteNotesColour: '#fff',
           blackNotesColour: '#000',
-          borderColour: '#000',
-          activeColour: 'yellow',
+          // borderColour: 'orange',
+          activeColour: 'lightblue',
           octaves: 2
       },
       keyboard = new QwertyHancock(settings);
@@ -208,12 +208,17 @@ function setup(context) {
   masterGain.gain.value = 0.3;
   masterGain.connect(context.destination); 
 
+
+
+
+
+
   keyboard.keyDown = function (note, frequency) {
       var oscillator = context.createOscillator();
-      oscillator.type = 'triangle';
+      oscillator.type = 'square';
       oscillator.frequency.value = frequency;
       oscillator.connect(masterGain);
-      oscillator.detune.value = 2
+      oscillator.detune.value = 1 / 100
       oscillator.start(0);
       nodes.push(oscillator);
 
@@ -235,38 +240,21 @@ function setup(context) {
       axisControls.rotationY += Math.random() / 500;
       axisControls.rotationZ += Math.random() / 500;
 
-      mesh.geometry.vertices[1].z = dataArray[150] / 5;
-      mesh.geometry.vertices[2].x = dataArray[220] / 10;
-      mesh.geometry.vertices[3].y = dataArray[33] / 30;
-      mesh.geometry.vertices[4].x = dataArray[23] / 13;
-      mesh.geometry.vertices[5].y = dataArray[55] / 13;
-      mesh.geometry.vertices[6].z = dataArray[99] / 40;
-      mesh.geometry.vertices[7].x = dataArray[156] / 10;
 
-      // mesh.geometry.vertices[0].z = dataArray[50] / 10;
-      // mesh.geometry.vertices[0].x = dataArray[50] / 10;
-      // mesh.geometry.vertices[0].y = dataArray[50] / 10;
-      // mesh.geometry.vertices[1].z = dataArray[50] / 10;
-      // mesh.geometry.vertices[1].x = dataArray[50] / 10;
-      // mesh.geometry.vertices[1].y = dataArray[50] / 10;
-      // mesh.geometry.vertices[2].z = dataArray[50] / 10;
-      // mesh.geometry.vertices[2].x = dataArray[50] / 10;
-      // mesh.geometry.vertices[2].y = dataArray[50] / 10;
-      // mesh.geometry.vertices[3].z = dataArray[50] / 10;
-      // mesh.geometry.vertices[3].x = dataArray[50] / 10;
-      // mesh.geometry.vertices[3].y = dataArray[50] / 10;
-      // mesh.geometry.vertices[4].z = dataArray[50] / 10;
-      // mesh.geometry.vertices[4].x = dataArray[50] / 10;
-      // mesh.geometry.vertices[4].y = dataArray[50] / 10;
-      // mesh.geometry.vertices[5].z = dataArray[50] / 10;
-      // mesh.geometry.vertices[5].x = dataArray[50] / 10;
-      // mesh.geometry.vertices[5].y = dataArray[50] / 10;
-      // mesh.geometry.vertices[6].z = dataArray[50] / 10;
-      // mesh.geometry.vertices[6].x = dataArray[50] / 10;
-      // mesh.geometry.vertices[6].y = dataArray[50] / 10;
-      // mesh.geometry.vertices[7].z = dataArray[50] / 10;
-      // mesh.geometry.vertices[7].x = dataArray[50] / 10;
-      // mesh.geometry.vertices[7].y = dataArray[50] / 10;
+      function randNum(){
+        return Math.random() * 100;
+      }
+      
+
+      mesh.geometry.vertices[1].z = dataArray[50] / randNum();
+      mesh.geometry.vertices[4].x = dataArray[50] / randNum();
+      mesh.geometry.vertices[3].x = dataArray[50] / randNum();
+
+      mesh.geometry.vertices[5].x = dataArray[50] / randNum();
+      mesh.geometry.vertices[6].z = dataArray[50] / randNum();
+      mesh.geometry.vertices[7].y = dataArray[50] / randNum();
+      
+
 
       updateGeometry();
 
