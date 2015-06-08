@@ -6,64 +6,60 @@
 // new THREE.TorusGeometry(100, 40, 40, 40, 6.28);
 // new THREE.TorusKnotGeometry(100, 40, 64, 8, 2, 3, 1);
 
+var dataArray, points;
 
-// global for web audio data
-var dataArray;
+points = [
+  new THREE.Vector3( 78.44, 1, -60.01 ),
+  new THREE.Vector3( 56.27, -26.38, 12.46 ),
+  new THREE.Vector3( -20.05, 80.56, 29.04 ),
+  new THREE.Vector3( 81.05, 96.49, 73.14 ),
+  new THREE.Vector3( -15.11, 17.76, 48.29 ),
+  new THREE.Vector3( 19.41, 33.28, 15.8 ),
+  new THREE.Vector3( -63.28, -84.1, -74.08 ),
+  new THREE.Vector3( -38.67, -91.75, -10.46 ),
+  new THREE.Vector3( -62.22, -33.21, -52 ),
+];
 
-  var points = [
-    new THREE.Vector3( 78.44, 1, -60.01 ),
-    new THREE.Vector3( 56.27, -26.38, 12.46 ),
-    new THREE.Vector3( -20.05, 80.56, 29.04 ),
-    new THREE.Vector3( 81.05, 96.49, 73.14 ),
-    new THREE.Vector3( -15.11, 17.76, 48.29 ),
-    new THREE.Vector3( 19.41, 33.28, 15.8 ),
-    new THREE.Vector3( -63.28, -84.1, -74.08 ),
-    new THREE.Vector3( -38.67, -91.75, -10.46 ),
-    new THREE.Vector3( -62.22, -33.21, -52 ),
-  ];
-// --------------------------------------------------------
-
+// --------------------------------------------------------------------------------
 
 // /////////////////////////////////////////////
 // /////////////// datGUI setup ////////////////
 // /////////////////////////////////////////////
 
+var AxisControlsConstructor, VectorPointConstructor, CameraControlsConstructor, gui;
+var axisControls, cameraControls, vectorPointControls;
+var f1, f2, f3, f4, f5, f6;
+
+// create the gui
+gui = new dat.GUI();
+
 //Define the controller constructor
-var AxisControlsConstructor = function() {
+AxisControlsConstructor = function() {
   this.rotationX = 0.001;
   this.rotationY = 0.001;
   this.rotationZ = 0.001;
 };
 
-var VectorPointConstructor = function() {
-}
+VectorPointConstructor = function() {}
 
-
-var CameraControlsConstructor = function() {
+CameraControlsConstructor = function() {
   this.positionX = 50;
   this.positionY = -45;
   this.positionZ = 400;
 };
-// create the gui
-var gui = new dat.GUI();
 
 // instantiate the controls
-var axisControls = new AxisControlsConstructor();
-var cameraControls = new CameraControlsConstructor();
-var vectorPointControls = new VectorPointConstructor();
+axisControls = new AxisControlsConstructor();
+cameraControls = new CameraControlsConstructor();
+vectorPointControls = new VectorPointConstructor();
 
 // declare the folder
-var f1 = gui.addFolder('Axit Rotation');
-var f2 = gui.addFolder('Vector Points');
-var f3 = gui.addFolder('Shape Colour');
-var f4 = gui.addFolder('Lighting');
-var f5 = gui.addFolder('Camera');
-var f6 = gui.addFolder('Environment');
-
-// render the folders as open
-// f1.open();
-
-// f2.open();
+f1 = gui.addFolder('Axit Rotation');
+f2 = gui.addFolder('Vector Points');
+f3 = gui.addFolder('Shape Colour');
+f4 = gui.addFolder('Lighting');
+f5 = gui.addFolder('Camera');
+f6 = gui.addFolder('Environment');
 
 // add controls to folder
 f1.add(axisControls, 'rotationX', 0, .2).listen();
@@ -74,8 +70,7 @@ f5.add(cameraControls, 'positionX', -400, 400).listen();
 f5.add(cameraControls, 'positionY', -400, 400).listen();
 f5.add(cameraControls, 'positionZ', -400, 400).listen();
 
-
-
+// --------------------------------------------------------------------------------
 
 // /////////////////////////////////////////////
 // ///////////////// three.js //////////////////
@@ -83,20 +78,20 @@ f5.add(cameraControls, 'positionZ', -400, 400).listen();
 
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-var camera, scene, renderer;
+var camera, scene, renderer, W;
 var geometry, material, mesh;
-var vectorPointPositionControls;
+var vectorPointPositionControls, VectorPointPositionConstructor;
 
-var stuff = [];
+// To escape context issues with 'this' & datGUI
+var contextEscapeArr = [];
 
-var VectorPointPositionConstructor = function(i) {
+VectorPointPositionConstructor = function(i) {
   this.vectorX = mesh.geometry.vertices[1].x
   this.vectorY = mesh.geometry.vertices[1].y
   this.vectorZ = mesh.geometry.vertices[1].z
 };
 
-
-function updateGeometry(){
+function updateGeometry() {
   geometry.verticesNeedUpdate = true;
 }
 
@@ -108,12 +103,10 @@ function setup(context) {
 
   // instantiate webGL as the renderer
   renderer = new THREE.WebGLRenderer();
-
   renderer.setClearColor( 0xADD8E6 );
 
-
   // declare and set the width+height of the renderer
-  var W = window.innerWidth, H = window.innerHeight;
+  W = window.innerWidth, H = window.innerHeight;
   renderer.setSize( W, H );
   document.body.appendChild( renderer.domElement );
 
@@ -122,28 +115,28 @@ function setup(context) {
 
   // ---SETUP 3d OBJECT -----
 
-  material = new THREE.MeshNormalMaterial({shading: THREE.FlatShading});
+  material = new THREE.MeshNormalMaterial({shading: THREE.SmoothShading});
   geometry = new THREE.ConvexGeometry( points );
   mesh = new THREE.Mesh(geometry, material);
   
   for (var i = 0; i < points.length; i++) {
-    vectorPointPositionControls = new VectorPointPositionConstructor();
-    stuff.push(vectorPointPositionControls);
-    var generateFolder = f2.addFolder('Point ' + i);
-    generateFolder.add(stuff[i], 'vectorX', -100, 100).listen();
-    generateFolder.add(stuff[i], 'vectorY', -100, 100).listen();
-    generateFolder.add(stuff[i], 'vectorZ', -100, 100).listen();
-    // instantiate the controls, loop through and retrieve individual vector points
+    var generateFolder;
 
+    vectorPointPositionControls = new VectorPointPositionConstructor();
+    contextEscapeArr.push(vectorPointPositionControls);
+    
+    generateFolder = f2.addFolder('Point ' + i);
+    generateFolder.add(contextEscapeArr[i], 'vectorX', -100, 100).listen();
+    generateFolder.add(contextEscapeArr[i], 'vectorY', -100, 100).listen();
+    generateFolder.add(contextEscapeArr[i], 'vectorZ', -100, 100).listen();
+
+    // instantiate the controls, loop through and retrieve individual vector points
     // generateFolder.add(vectorPointPositionControls, 'vectorY', -100, 100).listen();
     // generateFolder.add(vectorPointPositionControls, 'vectorZ', -100, 100).listen();
   }
   // addes mesh to the scene
 
   scene.add(mesh);
-
-
-
 
   // ------- LIGHTING -------
   ambientLight = new THREE.AmbientLight( 0x000000 );
@@ -175,28 +168,33 @@ function setup(context) {
   // var color = new THREE.Color("RGB(255,0,0)");
   // scence.add( grid );
 
+// --------------------------------------------------------------------------------
+
 // /////////////////////////////////////////////
 // ////////////// Web Audio API ////////////////
 // /////////////////////////////////////////////
 
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
+  var settings, context, analyser, oscillator, oscillator, new_nodes;
 
   // instantiating new AudioContext
-  var context = new AudioContext(),
-      settings = {
-          id: 'keyboard',
-          width: 200,
-          height: 50,
-          startNote: 'A2',
-          whiteNotesColour: '#fff',
-          blackNotesColour: '#000',
-          // borderColour: 'orange',
-          activeColour: 'lightblue',
-          octaves: 2
-      },
-      keyboard = new QwertyHancock(settings);
+  context = new AudioContext();
+  
+  settings = {
+    id: 'keyboard',
+    width: 200,
+    height: 50,
+    startNote: 'A2',
+    whiteNotesColour: '#fff',
+    blackNotesColour: '#000',
+    // borderColour: 'color',
+    activeColour: 'lightblue',
+    octaves: 2
+  };
+  
+  keyboard = new QwertyHancock(settings);
 
-  var analyser = context.createAnalyser();
+  analyser = context.createAnalyser();
   analyser.fftsize = 2048;
   analyser.minDecibels = -90;
   analyser.maxDecibels = -10;
@@ -208,61 +206,57 @@ function setup(context) {
   masterGain.gain.value = 0.3;
   masterGain.connect(context.destination); 
 
-
-
-
-
-
   keyboard.keyDown = function (note, frequency) {
-      var oscillator = context.createOscillator();
+      oscillator = context.createOscillator();
       oscillator.type = 'square';
       oscillator.frequency.value = frequency;
       oscillator.connect(masterGain);
-      oscillator.detune.value = 1 / 100
+      oscillator.detune.value = 1 / 1000
       oscillator.start(0);
       nodes.push(oscillator);
 
-
       oscillator.connect(analyser);
-      analyser.connect(context.destination);
-      
+      analyser.connect(context.destination);      
 
-      var bufferLength = analyser.frequencyBinCount
-      var dataArray = new Uint8Array(analyser.frequencyBinCount);
+      bufferLength = analyser.frequencyBinCount;
+      dataArray = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteTimeDomainData(dataArray);
 
-      console.log(dataArray);
-
-      // Change object properties on keydown from analyzer data
+      // Change object properties on keydown from analyser data
       console.log(dataArray);
       
       axisControls.rotationX += Math.random() / 500;
       axisControls.rotationY += Math.random() / 500;
       axisControls.rotationZ += Math.random() / 500;
 
+      console.log(bufferLength);
 
-      function randNum(){
+      function randNum() {
         return Math.random() * 100;
       }
       
-
       mesh.geometry.vertices[1].z = dataArray[50] / randNum();
       mesh.geometry.vertices[4].x = dataArray[50] / randNum();
       mesh.geometry.vertices[3].x = dataArray[50] / randNum();
-
       mesh.geometry.vertices[5].x = dataArray[50] / randNum();
       mesh.geometry.vertices[6].z = dataArray[50] / randNum();
       mesh.geometry.vertices[7].y = dataArray[50] / randNum();
-      
 
+      // Playing around with data visualisations
+      // for (var i = 0; i < bufferLength; i++) {
+      //   distortion = dataArray[i]/2;
+
+      //   canvasCtx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
+      //   canvasCtx.fillRect(x,HEIGHT-barHeight/2,barWidth,barHeight);
+
+      //   x += barWidth + 1;
+      // }
 
       updateGeometry();
-
-
   };
 
   keyboard.keyUp = function (note, frequency) {
-      var new_nodes = [];
+      new_nodes = [];
 
       for (var i = 0; i < nodes.length; i++) {
           if (Math.round(nodes[i].frequency.value) === Math.round(frequency)) {
@@ -277,6 +271,8 @@ function setup(context) {
   };
 
 }
+
+// --------------------------------------------------------------------------------
 
 // /////////////////////////////////////////////
 // //////////// Render 3d on page //////////////
@@ -294,12 +290,10 @@ function draw() {
   camera.position.z = cameraControls.positionZ;
 
   // VECTOR POINTS
-  // console.log(vectorPointPositionControls.vectorX);
-  for(var i=0; i<3; i++) {
-    mesh.geometry.vertices[i].x = stuff[i].vectorX;    
-    mesh.geometry.vertices[i].y = stuff[i].vectorY; 
-    mesh.geometry.vertices[i].z = stuff[i].vectorZ; 
-
+  for (var i=0; i<3; i++) {
+    mesh.geometry.vertices[i].x = contextEscapeArr[i].vectorX;    
+    mesh.geometry.vertices[i].y = contextEscapeArr[i].vectorY; 
+    mesh.geometry.vertices[i].z = contextEscapeArr[i].vectorZ; 
   }
 
   updateGeometry();

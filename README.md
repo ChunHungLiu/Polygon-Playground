@@ -1,4 +1,4 @@
-Demo(in progress): http://torquemad.github.io/TERMITE/
+Demo(in progress): http://torquemad.github.io/Polygon-Playground/
 
 #Mozilla's Web Audio API
 

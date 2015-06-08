@@ -1,14 +1,3 @@
-/*
- * Qwerty Hancock keyboard library v0.4.5
- * The web keyboard for now people.
- * Copyright 2012-14, Stuart Memo
- *
- * Licensed under the MIT License
- * http://opensource.org/licenses/mit-license.php
- *
- * http://stuartmemo.com/qwerty-hancock
- */
-
 (function (window, undefined) {
     var version = '0.4.5',
         settings = {},
