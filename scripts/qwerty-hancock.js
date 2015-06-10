@@ -211,11 +211,12 @@
     */
     var styleKeyboard = function (keyboard) {
         var styleElement = function (el) {
+            el.style.bottom = 0;
+            el.style.position = 'fixed';
             el.style.cursor = 'default';
             el.style.fontSize = '0px';
             el.style.height = settings.height + 'px';
             el.style.padding = 0;
-            el.style.position = 'relative';
             el.style.listStyle = 'none';
             el.style.margin = 0;
             el.style.width = settings.width + 'px';

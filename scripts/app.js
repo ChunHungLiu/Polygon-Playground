@@ -175,12 +175,13 @@ function setup(context) {
 // /////////////////////////////////////////////
 
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
-  var settings, context, analyser, oscillator, oscillator, new_nodes;
+  var keyboardSettings, context, analyser, oscillator, oscillator, nodes, new_nodes, masterGain;
 
   // instantiating new AudioContext
   context = new AudioContext();
   
-  settings = {
+
+  keyboardSettings = {
     id: 'keyboard',
     width: 200,
     height: 50,
@@ -192,7 +193,7 @@ function setup(context) {
     octaves: 2
   };
   
-  keyboard = new QwertyHancock(settings);
+  keyboard = new QwertyHancock(keyboardSettings);
 
   analyser = context.createAnalyser();
   analyser.fftsize = 2048;
@@ -204,72 +205,81 @@ function setup(context) {
   nodes = [];
 
   masterGain.gain.value = 0.3;
+
   masterGain.connect(context.destination); 
 
   keyboard.keyDown = function (note, frequency) {
-      oscillator = context.createOscillator();
-      oscillator.type = 'square';
-      oscillator.frequency.value = frequency;
-      oscillator.connect(masterGain);
-      oscillator.detune.value = 1 / 1000
-      oscillator.start(0);
-      nodes.push(oscillator);
 
-      oscillator.connect(analyser);
-      analyser.connect(context.destination);      
+    
+    oscillator = context.createOscillator();
+    oscillator.frequency.value = frequency;
+    
+    // Makes the audio retro (don't forget to introduce sound wave type in datGUI)
+    // oscillator.type = 'square';
 
-      bufferLength = analyser.frequencyBinCount;
-      dataArray = new Uint8Array(analyser.frequencyBinCount);
-      analyser.getByteTimeDomainData(dataArray);
+    var masterGain = context.createGain();
 
-      // Change object properties on keydown from analyser data
-      console.log(dataArray);
-      
-      axisControls.rotationX += Math.random() / 500;
-      axisControls.rotationY += Math.random() / 500;
-      axisControls.rotationZ += Math.random() / 500;
+    oscillator.connect(masterGain, analyser);
+    masterGain.connect(context.destination);
 
-      console.log(bufferLength);
+    var now = context.currentTime;
 
-      function randNum() {
-        return Math.random() * 100;
-      }
-      
-      mesh.geometry.vertices[1].z = dataArray[50] / randNum();
-      mesh.geometry.vertices[4].x = dataArray[50] / randNum();
-      mesh.geometry.vertices[3].x = dataArray[50] / randNum();
-      mesh.geometry.vertices[5].x = dataArray[50] / randNum();
-      mesh.geometry.vertices[6].z = dataArray[50] / randNum();
-      mesh.geometry.vertices[7].y = dataArray[50] / randNum();
+    masterGain.gain.setValueAtTime(1, now);
+    masterGain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+    oscillator.start(now);
+    oscillator.stop(now + 5.5);
 
-      // Playing around with data visualisations
-      // for (var i = 0; i < bufferLength; i++) {
-      //   distortion = dataArray[i]/2;
+    // nodes.push(oscillator);
 
-      //   canvasCtx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
-      //   canvasCtx.fillRect(x,HEIGHT-barHeight/2,barWidth,barHeight);
+    // Analyses audio data
+    analyser.connect(context.destination);      
+    bufferLength = analyser.frequencyBinCount;
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteTimeDomainData(dataArray);
+    console.log(dataArray);
+    
+    // Change object properties on keydown from analyser data
+    axisControls.rotationX += Math.random() / 500;
+    axisControls.rotationY += Math.random() / 500;
+    axisControls.rotationZ += Math.random() / 500;
 
-      //   x += barWidth + 1;
-      // }
+    function randNum() {
+      return Math.random() * 100;
+    }
+    
+    mesh.geometry.vertices[1].z = dataArray[50] / randNum();
+    mesh.geometry.vertices[4].x = dataArray[50] / randNum();
+    mesh.geometry.vertices[3].x = dataArray[50] / randNum();
+    mesh.geometry.vertices[5].x = dataArray[50] / randNum();
+    mesh.geometry.vertices[6].z = dataArray[50] / randNum();
+    mesh.geometry.vertices[7].y = dataArray[50] / randNum();
 
-      updateGeometry();
+    // Playing around with data visualisations
+    // for (var i = 0; i < bufferLength; i++) {
+    //   distortion = dataArray[i]/2;
+
+    //   canvasCtx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
+    //   canvasCtx.fillRect(x,HEIGHT-barHeight/2,barWidth,barHeight);
+
+    //   x += barWidth + 1;
+    // }
+
+    updateGeometry();
   };
 
   keyboard.keyUp = function (note, frequency) {
       new_nodes = [];
 
       for (var i = 0; i < nodes.length; i++) {
-          if (Math.round(nodes[i].frequency.value) === Math.round(frequency)) {
-              nodes[i].stop(0);
-              nodes[i].disconnect();
+        if (Math.round(nodes[i].frequency.value) === Math.round(frequency)) {
+            nodes[i].stop(0);
+            nodes[i].disconnect();
           } else {
-              new_nodes.push(nodes[i]);
+            new_nodes.push(nodes[i]);
           }
-      }
-
-      nodes = new_nodes;
+        }
+    nodes = new_nodes;
   };
-
 }
 
 // --------------------------------------------------------------------------------
