@@ -54,12 +54,13 @@ cameraControls = new CameraControlsConstructor();
 vectorPointControls = new VectorPointConstructor();
 
 // declare the folder
+// Comments are features in progress
 f1 = gui.addFolder('Axit Rotation');
 f2 = gui.addFolder('Vector Points');
-f3 = gui.addFolder('Shape Colour');
-f4 = gui.addFolder('Lighting');
+// f3 = gui.addFolder('Shape Colour');
+// f4 = gui.addFolder('Lighting');
 f5 = gui.addFolder('Camera');
-f6 = gui.addFolder('Environment');
+// f6 = gui.addFolder('Environment');
 
 // add controls to folder
 f1.add(axisControls, 'rotationX', 0, .2).listen();
@@ -95,7 +96,7 @@ function updateGeometry() {
   geometry.verticesNeedUpdate = true;
 }
 
-function setup(context) {
+function setup(audioCtx) {
 
   //----SETUP ENVIRONMENT----
   // instantiate the THREE scene
@@ -126,16 +127,15 @@ function setup(context) {
     contextEscapeArr.push(vectorPointPositionControls);
     
     generateFolder = f2.addFolder('Point ' + i);
-    generateFolder.add(contextEscapeArr[i], 'vectorX', -100, 100).listen();
-    generateFolder.add(contextEscapeArr[i], 'vectorY', -100, 100).listen();
-    generateFolder.add(contextEscapeArr[i], 'vectorZ', -100, 100).listen();
+    generateFolder.add(contextEscapeArr[i], 'vectorX', -200, 200).listen();
+    generateFolder.add(contextEscapeArr[i], 'vectorY', -200, 200).listen();
+    generateFolder.add(contextEscapeArr[i], 'vectorZ', -200, 200).listen();
 
     // instantiate the controls, loop through and retrieve individual vector points
     // generateFolder.add(vectorPointPositionControls, 'vectorY', -100, 100).listen();
     // generateFolder.add(vectorPointPositionControls, 'vectorZ', -100, 100).listen();
   }
   // addes mesh to the scene
-
   scene.add(mesh);
 
   // ------- LIGHTING -------
@@ -175,10 +175,10 @@ function setup(context) {
 // /////////////////////////////////////////////
 
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
-  var keyboardSettings, context, analyser, oscillator, oscillator, nodes, new_nodes, masterGain;
+  var keyboardSettings, audioCtx, analyser, oscillator, oscillator, nodes, new_nodes, masterGain;
 
   // instantiating new AudioContext
-  context = new AudioContext();
+  audioCtx = new AudioContext();
   
 
   keyboardSettings = {
@@ -195,34 +195,34 @@ function setup(context) {
   
   keyboard = new QwertyHancock(keyboardSettings);
 
-  analyser = context.createAnalyser();
-  analyser.fftsize = 2048;
+  analyser = audioCtx.createAnalyser();
+  analyser.fftsize = 256;
   analyser.minDecibels = -90;
   analyser.maxDecibels = -10;
   analyser.smoothingTimeConstant = 0.85;
 
-  masterGain = context.createGain();
+  masterGain = audioCtx.createGain();
   nodes = [];
 
   masterGain.gain.value = 0.3;
 
-  masterGain.connect(context.destination); 
+  masterGain.connect(audioCtx.destination); 
 
   keyboard.keyDown = function (note, frequency) {
 
     
-    oscillator = context.createOscillator();
+    oscillator = audioCtx.createOscillator();
     oscillator.frequency.value = frequency;
     
-    // Makes the audio retro (don't forget to introduce sound wave type in datGUI)
-    // oscillator.type = 'square';
+    // Makes the audio retro
+    oscillator.type = 'square';
 
-    var masterGain = context.createGain();
+    var masterGain = audioCtx.createGain();
 
     oscillator.connect(masterGain, analyser);
-    masterGain.connect(context.destination);
+    masterGain.connect(audioCtx.destination);
 
-    var now = context.currentTime;
+    var now = audioCtx.currentTime;
 
     masterGain.gain.setValueAtTime(1, now);
     masterGain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
@@ -232,11 +232,13 @@ function setup(context) {
     // nodes.push(oscillator);
 
     // Analyses audio data
-    analyser.connect(context.destination);      
+    analyser.connect(audioCtx.destination);      
     bufferLength = analyser.frequencyBinCount;
-    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    bufferLength = analyser.fftsize;
+    dataArray = new Uint8Array(bufferLength);
     analyser.getByteTimeDomainData(dataArray);
     console.log(dataArray);
+    console.log(dataArray.length);
     
     // Change object properties on keydown from analyser data
     axisControls.rotationX += Math.random() / 500;
